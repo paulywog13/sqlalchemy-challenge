@@ -33,8 +33,8 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start>"
-        f"/api/v1.0/<start>/<end>"
+        f"/api/v1.0/start/<start><br/>"
+        f"/api/v1.0/start/end/<start>/<end>"
     )
 # 3. Define what to do when a user hits the index route
 @app.route("/api/v1.0/precipitation")
@@ -85,10 +85,51 @@ def tobs():
     return jsonify(tobs_list)
 
 #@app.route("/api/v1.0/<start>" and "/api/v1.0/,start>/<end>")
-#@app.route("/api/v1.0/<start>")
-#@app.route("/api/v1.0/temp/<start>/<end>")
+@app.route("/api/v1.0/start/<start>")
+@app.route("/api/v1.0/start/end/<start>/<end>")
+def temp(start= None, end= None):
+    start_date = start
+    end_date = end
 
+    session = Session(engine)
 
+    if end_date == None:
+        MaxTemp = session.query(func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).scalar() 
+
+        MinTemp = session.query(func.min(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).scalar()
+    
+        AveTemp = session.query(func.avg(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).scalar()
+
+    else:
+
+        MaxTemp = session.query(func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).\
+        filter(Measurement.date <= end_date).scalar() 
+
+        MinTemp = session.query(func.min(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).\
+        filter(Measurement.date <= end_date).scalar()
+    
+        AveTemp = session.query(func.avg(Measurement.tobs)).\
+        filter(Measurement.date >= start_date).\
+        filter(Measurement.date <= end_date).scalar()
+    
+    session.close()
+
+    temp_date = []
+    temp_date_dict = {}
+    temp_date_dict["Start_Date"] = start_date
+    temp_date_dict["End_Date"] = end_date
+    temp_date_dict["Max_Temp"] = MaxTemp
+    temp_date_dict["Min_Temp"] = MinTemp
+    temp_date_dict["Avg_Temp"] = round(AveTemp, 2)
+    temp_date.append(temp_date_dict)
+
+    return jsonify(temp_date)
+ 
 
 
 if __name__ == '__main__':

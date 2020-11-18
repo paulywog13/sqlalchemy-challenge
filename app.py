@@ -1,10 +1,11 @@
 # 1. import Dependencies
-import numpy as np
+
 
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
+import numpy as np
 
 from flask import Flask, jsonify
 
@@ -33,6 +34,7 @@ def welcome():
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
         f"/api/v1.0/<start>"
+        f"/api/v1.0/<start>/<end>"
     )
 # 3. Define what to do when a user hits the index route
 @app.route("/api/v1.0/precipitation")
@@ -72,13 +74,23 @@ def tobs():
     session = Session(engine)
     # Query the dates and temperature observations of the 
     # most active station for the last year of data.
-    tobs_results = session.query(Measurement.date, Measurement.tobs).all()
+      
+    tobs = session.query(Measurement.tobs).filter(Measurement.date >= '2016-08-23').\
+        filter(Measurement.station == 'USC00519281').all()
 
     session.close()
 
-    all_tobs = list(np.ravel(tobs_results))
+    tobs_list = list(np.ravel(tobs))
     # Return a JSON list of temperature observations (TOBS) for the previous year.
-    return jsonify(all_tobs)
+    return jsonify(tobs_list)
 
-@app.route("/api/v1.0/<start>" and "/api/v1.0/,start>/<end>")
+#@app.route("/api/v1.0/<start>" and "/api/v1.0/,start>/<end>")
+#@app.route("/api/v1.0/<start>")
+#@app.route("/api/v1.0/temp/<start>/<end>")
 
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+session.close()

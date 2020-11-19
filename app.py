@@ -34,7 +34,8 @@ def welcome():
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
         f"/api/v1.0/start/<start><br/>"
-        f"/api/v1.0/start/end/<start>/<end>"
+        f"/api/v1.0/start/end/<start>/<end><br/>"
+        f"Start and End Date Format yyyy-mm-dd"
     )
 # 3. Define what to do when a user hits the index route
 @app.route("/api/v1.0/precipitation")
